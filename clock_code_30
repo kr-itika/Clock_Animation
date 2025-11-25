@@ -1,0 +1,134 @@
+import maya.cmds as cmds
+import math
+
+ROLL_NUMBER = 30
+
+cmds.select(clear=True)
+
+if cmds.objExists('Clock_Group'):
+    cmds.delete('Clock_Group')
+
+if cmds.objExists('clock_expression'):
+    cmds.delete('clock_expression')
+
+outer_frame = cmds.polyCylinder(name='Outer_Frame', radius=5.2, height=0.8, subdivisionsX=60, axis=[0, 0, 1])[0]
+cmds.move(0, 0, 0, outer_frame)
+
+inner_frame = cmds.polyCylinder(name='Inner_Frame', radius=5.0, height=0.6, subdivisionsX=60, axis=[0, 0, 1])[0]
+cmds.move(0, 0, 0.1, inner_frame)
+
+clock_face = cmds.polyCylinder(name='Clock_Face', radius=4.7, height=0.3, subdivisionsX=60, axis=[0, 0, 1])[0]
+cmds.move(0, 0, 0.45, clock_face)
+
+center_hub = cmds.polyCylinder(name='Center_Hub', radius=0.4, height=0.4, subdivisionsX=30, axis=[0, 0, 1])[0]
+cmds.move(0, 0, 0.8, center_hub)
+
+hour_numbers = []
+number_positions = [
+    ("12", 0, 3.8, 0), ("1", 1.9, 3.3, -30), ("2", 3.3, 1.9, -60),
+    ("3", 3.8, 0, -90), ("4", 3.3, -1.9, -120), ("5", 1.9, -3.3, -150),
+    ("6", 0, -3.8, -180), ("7", -1.9, -3.3, -210), ("8", -3.3, -1.9, -240),
+    ("9", -3.8, 0, -270), ("10", -3.3, 1.9, -300), ("11", -1.9, 3.3, -330)
+]
+
+for text, x, y, rot in number_positions:
+    text_curve = cmds.textCurves(text=text, font='Arial', constructionHistory=False)[0]
+    shapes = cmds.listRelatives(text_curve, children=True, shapes=True)
+    
+    parts = []
+    for shape in shapes:
+        parent = cmds.listRelatives(shape, parent=True)[0]
+        surf = cmds.planarSrf(parent, degree=1, constructionHistory=False)[0]
+        solid = cmds.extrude(surf, constructionHistory=False, distance=0.2)[0]
+        parts.append(solid)
+    
+    if len(parts) > 1:
+        number = cmds.polyUnite(*parts, name=f'Number_{text}', constructionHistory=False)[0]
+    else:
+        number = cmds.rename(parts[0], f'Number_{text}')
+    
+    cmds.delete(text_curve)
+    cmds.scale(0.4, 0.4, 0.4, number)
+    cmds.move(x, y, 0.65, number)
+    cmds.rotate(0, 0, rot, number)
+    cmds.xform(number, centerPivots=True)
+    hour_numbers.append(number)
+
+minute_markers = []
+for i in range(60):
+    angle = (i * 6) * (math.pi / 180)
+    if i % 5 == 0:
+        radius, height, width = 4.4, 0.35, 0.12
+    else:
+        radius, height, width = 4.5, 0.2, 0.06
+    
+    x = radius * math.sin(angle)
+    y = radius * math.cos(angle)
+    marker = cmds.polyCube(name=f'Minute_Marker_{i+1}', width=width, height=height, depth=0.08)[0]
+    cmds.move(x, y, 0.6, marker)
+    cmds.rotate(0, 0, -i*6, marker)
+    minute_markers.append(marker)
+
+h_base = cmds.polyCube(name='hour_hand_base', width=0.35, height=2.2, depth=0.12)[0]
+cmds.move(0, 1.1, 0.65, h_base)
+h_tip = cmds.polyCone(name='hour_hand_tip', radius=0.25, height=0.5, subdivisionsX=20, axis=[0, 1, 0])[0]
+cmds.move(0, 2.45, 0.65, h_tip)
+hour_hand = cmds.polyUnite(h_base, h_tip, name='hour_hand')[0]
+cmds.xform(hour_hand, pivots=[0, 0, 0.65], worldSpace=True)
+
+m_base = cmds.polyCube(name='minute_hand_base', width=0.28, height=3.2, depth=0.12)[0]
+cmds.move(0, 1.6, 0.7, m_base)
+m_tip = cmds.polyCone(name='minute_hand_tip', radius=0.2, height=0.4, subdivisionsX=20, axis=[0, 1, 0])[0]
+cmds.move(0, 3.4, 0.7, m_tip)
+m_tail = cmds.polyCube(name='minute_hand_tail', width=0.2, height=0.8, depth=0.12)[0]
+cmds.move(0, -0.4, 0.7, m_tail)
+minute_hand = cmds.polyUnite(m_base, m_tip, m_tail, name='minute_hand')[0]
+cmds.xform(minute_hand, pivots=[0, 0, 0.7], worldSpace=True)
+
+second_hand = cmds.polyCube(name='Second_Hand', width=0.08, height=4.2, depth=0.08)[0]
+cmds.move(0, 2.1, 0.75, second_hand)
+cmds.xform(second_hand, pivots=[0, 0, 0.75], worldSpace=True)
+
+def create_material(name, color):
+    shader = cmds.shadingNode('lambert', name=name, asShader=True)
+    sg = cmds.sets(name=f'{name}_SG', renderable=True, noSurfaceShader=True, empty=True)
+    cmds.connectAttr(f'{shader}.outColor', f'{sg}.surfaceShader')
+    cmds.setAttr(f'{shader}.color', color[0], color[1], color[2], type='double3')
+    return shader, sg
+
+_, frame_sg = create_material('Gold_Frame', [0.8, 0.65, 0.3])
+cmds.sets(outer_frame, inner_frame, edit=True, forceElement=frame_sg)
+
+_, face_sg = create_material('Black_Face', [0.05, 0.05, 0.05])
+cmds.sets(clock_face, edit=True, forceElement=face_sg)
+
+_, num_sg = create_material('White_Numbers', [0.95, 0.95, 0.95])
+cmds.sets(*hour_numbers, *minute_markers, edit=True, forceElement=num_sg)
+
+_, hands_sg = create_material('Gold_Hands', [0.8, 0.65, 0.3])
+cmds.sets(hour_hand, minute_hand, edit=True, forceElement=hands_sg)
+
+_, sec_sg = create_material('Red_Second', [0.9, 0.1, 0.1])
+cmds.sets(second_hand, edit=True, forceElement=sec_sg)
+
+_, hub_sg = create_material('White_Hub', [0.95, 0.95, 0.95])
+cmds.sets(center_hub, edit=True, forceElement=hub_sg)
+
+all_parts = [outer_frame, inner_frame, clock_face, center_hub, hour_hand, minute_hand, second_hand] + hour_numbers + minute_markers
+clock_group = cmds.group(*all_parts, name='Clock_Group')
+
+cmds.playbackOptions(minTime=1, maxTime=7200)
+cmds.playbackOptions(loop='continuous')
+
+anim = """
+float $f = frame;
+Second_Hand.rotateZ = -($f / 600.0) * 360.0;
+minute_hand.rotateZ = -($f / 7200.0) * 360.0;
+hour_hand.rotateZ = -($f / 86400.0) * 360.0;
+"""
+cmds.expression(name='clock_expression', string=anim)
+
+cmds.viewFit()
+cmds.select(clock_group)
+
+print("Clock Animation Created - Roll No:", ROLL_NUMBER)
