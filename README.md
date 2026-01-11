@@ -1,48 +1,35 @@
-3D Animated Wall Clock
-Course: Graphics and Visual Computing
-Name: Kritika Kesarwani
-Roll No: 30
+#3D Clock Animation
 
-What I Made
+This project is a procedurally modeled and animated 3D wall clock developed as part of the Graphics & Visual Computing (GVC) coursework. The objective was to apply core computer graphics concepts and transform them into a clear and visually engaging animation using Autodesk Maya and Python scripting.
 
-A 3D animated wall clock in Maya with a golden frame, black face, white numbers, and three animated hands that rotate clockwise at the correct speeds.
+The clock is created entirely from basic geometric primitives, and its animation is driven by expression-based, frame-driven logic instead of manual keyframes. The hour, minute, and second hands rotate clockwise with accurate relative speeds, producing smooth and realistic synchronization. Basic materials, lighting, and shadows are applied while keeping the scene clean and well-organized.
 
-What I Learned (GVC Concepts)
+🛠 Tech Stack
+Autodesk Maya (Educational Version)
+Python (maya.cmds)
+Arnold Renderer
 
-Modeling: Created clock using cylinders, cubes, cones
-Animation: Hands rotate using frame-based expressions
-Transformations: Positioned and rotated all objects
-Lighting & Shadows: Added light with shadow casting
-Materials: Applied colors using Lambert shaders
-Scripting: Used Python to automate everything
-Rendering: Used Arnold for final output
+⚙️ Techniques & Concepts
+Procedural modeling using polygon primitives
+Expression-driven animation logic
+Geometric transformations and pivot alignment
+Hierarchical object structuring
+Lighting, materials, and shadow rendering
 
-How to Use It
+🎯 Outcome
+The final animation demonstrates how logical thinking, scripting, and graphics fundamentals work together to create a structured and realistic visual result. The project is designed to be easy to understand and explain during evaluations, interviews, or portfolio reviews.
 
-Open Maya
-Open Script Editor 
-Go to Python tab
-Copy code from clock_30.py
-Paste and press Ctrl+Enter
-Press Play to see it animate
+🧩 What I Built
+A 3D animated wall clock with a golden frame, black clock face, white numbers, and three animated hands rotating clockwise at correct speeds to simulate real-time motion.
 
-How It Works
+▶️ How to Run the Project
+Open Autodesk Maya and launch the Script Editor
+Switch to the Python tab
+Copy and run the code from clock_30.py
+Press Play to view the animation
 
+🧠 Challenges Faced
+The main challenges involved correcting the rotation direction of the clock hands and preventing animation resets during timeline loops, which were resolved by using frame-based expressions instead of keyframes.
 
-The script creates the clock geometry (frame, face, numbers, hands) and then applies an expression that rotates the hands based on the current frame number. The second hand completes one rotation every 10 seconds, minute hand every 2 minutes, hour hand every 24 minutes.
-Numbers are created as 3D text using extrusion.
-
-What's Inside
-
-clock_30.py - Python script
-Clock_animation_30.mb - Maya scene file
-Screenshots of the clock
-Demo video showing animation
-Project poster
-
-Challenges I Had
-
-The hands were rotating the wrong way at first, so I had to use negative values in the rotation formula. Also, when the timeline looped, the hands would reset to zero, so I switched to frame-based calculations instead of keyframes.
-
-This Is My Original Work
-All code written by me. No external plugins used, just Maya's built-in Python API.
+✅ Original Work
+This project is entirely my original work, implemented using Maya’s built-in Python API without any external plugins or third-party tools.
