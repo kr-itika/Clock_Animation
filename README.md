@@ -25,9 +25,26 @@ The final animation demonstrates how logical thinking, scripting, and graphics f
 🧩 What I Built
 
 A 3D animated wall clock with a golden frame, black clock face, white numbers, and three animated hands rotating clockwise at correct speeds to simulate real-time motion.
+## 📸 Screenshots
 
-▶️ How to Run the Project
+### Rendered View
+![Rendered Clock](screenshots/rendered.png)
 
+### Textured View
+![Textured Clock](screenshots/textured.png)
+
+### Wireframe View
+![Wireframe Clock](screenshots/wireframe.png)
+
+### Script Screenshot
+![Code Screenshot](screenshots/code_ss.png)
+
+## 🎥 Animation Demo
+
+▶️ Watch the full 3D clock animation here:  
+https://youtu.be/uivisQb07wo
+
+▶️ How to Run the Project: 
 Open Autodesk Maya and launch the Script Editor
 Switch to the Python tab
 Copy and run the code from clock_30.py
